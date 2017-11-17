@@ -6,8 +6,10 @@
  Jaime Fernandez (@vissit)
  company:
  Paradigma Tecnologico (@paradigmate)
- Extra:
+ extra:
  custom version
+ repo:
+ https://github.com/paneedesign/jQueryEventCalendar
  */
 
 ;$.fn.eventCalendar = function (options) {
@@ -62,8 +64,6 @@
 
             getEvents(eventsOpts.eventsLimit, year, month, false, "month");
         })
-
-
     });
 
     // show event description
@@ -204,17 +204,20 @@
             data_date = new Date(year, month, dayCount);
 
             var todayTimestamp = eventsOpts.todayTimestamp;
+            var maxDayTimestamp = eventsOpts.maxDayTimestamp;
             var dayTimestamp = data_date.getTime();
 
             if (day > 0 && dayCount === day && year === currentYear && eventsOpts.showToday) {
                 dayClass = "today";
-            } else if (dayTimestamp < todayTimestamp) {
+            } else if (dayTimestamp < todayTimestamp || (maxDayTimestamp && dayTimestamp > maxDayTimestamp)) {
                 dayClass = "past";
             }
 
 
             if (eventsOpts.showMoreDetails) {
-                daysList.push('<li id="dayList_' + dayCount + '" rel="' + dayCount + '" class="eventsCalendar-day ' + dayClass + '"><a href="#" id="day-event-' + dayCount + '" class="show-event-btn" data-date="' + data_date + '">' + dayCount + '</a></li>');
+                daysList.push('<li id="dayList_' + dayCount + '" rel="' + dayCount + '" class="eventsCalendar-day ' + dayClass + '">' +
+                    '   <a href="#" id="day-event-' + dayCount + '" class="show-event-btn" data-date="' + data_date + '">' + dayCount + '</a>' +
+                    '</li>');
             } else if (eventsOpts.showTooltip) {
                 // check for tooltip position
                 var tooltip_position = 'auto';
@@ -224,13 +227,16 @@
                 if (((empty_days + dayCount - 1) % 7) == 0 || ((empty_days + dayCount - 2) % 7) == 0) {
                     tooltip_position = 'right';
                 }
-                daysList.push('<li id="dayList_' + dayCount + '" rel="' + dayCount + '" class="eventsCalendar-day ' + dayClass + '"><a href="#" data-placement=' + tooltip_position + '>' + dayCount + '</a></li>');
+                daysList.push('' +
+                    '<li id="dayList_' + dayCount + '" rel="' + dayCount + '" class="eventsCalendar-day ' + dayClass + '">' +
+                    '   <a href="#" data-placement=' + tooltip_position + '>' + dayCount + '</a>' +
+                    '</li>');
 
-            }
-            else {
+            } else {
                 // default plugin
-                daysList.push('<li id="dayList_' + dayCount + '" rel="' + dayCount + '" class="eventsCalendar-day ' + dayClass + '"><a href="#">' + dayCount + '</a></li>');
-
+                daysList.push('<li id="dayList_' + dayCount + '" rel="' + dayCount + '" class="eventsCalendar-day ' + dayClass + '">' +
+                    '   <a href="#">' + dayCount + '</a>' +
+                    '</li>');
             }
         }
         $eventsCalendarDaysList.append(daysList.join(''));
@@ -513,6 +519,7 @@ $.fn.eventCalendar.defaults = {
     showMoreDetails: false,
     showTooltip: false,
     todayTimestamp: new Date().getTime(),
+    maxDayTimestamp: false,
     showToday: true,
     monthToShow: new Date()
 };
